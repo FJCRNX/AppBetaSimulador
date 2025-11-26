@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuroda App</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración de Tailwind para usar el color rojo de la marca -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kuroda-red': '#8A0303',
+                        'kuroda-dark': '#5C0202',
+                        'kuroda-light': '#FEE2E2',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos generales para centrar el contenido y asegurar el responsive */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        #app {
+            background-color: #f7f7f7;
+            width: 100%;
+            max-width: 420px; /* Simulación de dispositivo móvil */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .screen-container {
+            flex-grow: 1;
+            padding: 0;
+            display: none; /* Ocultar todas las pantallas por defecto */
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .screen-container.active {
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilos específicos para la UX de Kuroda (rojo oscuro) */
+        .kuroda-header {
+            background-color: #8A0303;
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .kuroda-full-bg {
+            background-color: #8A0303;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .kuroda-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .kuroda-btn-primary {
+            background-color: white;
+            color: #8A0303;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: background-color 0.15s;
+        }
+        .kuroda-btn-primary:hover {
+            background-color: #FEE2E2;
+        }
+        .kuroda-btn-secondary {
+            background-color: #8A0303;
+            color: white;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: opacity 0.15s;
+        }
+        .kuroda-btn-secondary:hover {
+            opacity: 0.9;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: white;
+            color: #4B5563; /* Gray-600 */
+        }
+        /* Para hacer responsive en pantallas grandes (PC) */
+        @media (min-width: 768px) {
+            #app {
+                max-width: 1024px;
+                border-radius: 12px;
+                min-height: 800px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+            .kuroda-full-bg {
+                padding: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Contenedores de Pantallas (Vistas) -->
+
+    <!-- 1. Pantalla de Registro -->
+    <div id="register-screen" class="screen-container active">
+        <div class="kuroda-full-bg flex flex-col justify-center items-center p-8">
+            <div class="mb-10 text-center">
+                <div class="flex justify-center items-center space-x-2 mb-4">
+                    <span class="bg-white text-kuroda-red rounded-full w-12 h-12 flex items-center justify-center text-2xl font-bold">K</span>
+                    <h1 class="text-3xl font-bold">uroda</h1>
+                </div>
+                <p class="text-sm">La Experiencia está en...</p>
+                <h2 class="text-2xl font-semibold mt-6">Registro de Usuario</h2>
+            </div>
+
+            <form id="register-form" class="w-full max-w-sm space-y-4">
+                <input type="text" id="reg-name" placeholder="Nombre completo" class="input-field" required>
+                <input type="email" id="reg-email" placeholder="Correo electrónico" class="input-field" required>
+                <input type="tel" id="reg-phone" placeholder="Teléfono" class="input-field">
+                <input type="password" id="reg-password" placeholder="Contraseña" class="input-field" required>
+                <input type="password" id="reg-confirm-password" placeholder="Confirmar contraseña" class="input-field" required>
+
+                <button type="submit" class="w-full kuroda-btn-primary mt-6">Registrar</button>
+            </form>
+
+            <p class="mt-8 text-sm">
+                ¿Ya tienes cuenta? <a href="#" onclick="showScreen('login-screen')" class="font-semibold underline">Iniciar sesión</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- 2. Pantalla de Inicio de Sesión -->
+    <div id="login-screen" class="screen-container">
+        <div class="kuroda-full-bg flex flex-col justify-center items-center p-8">
+            <div class="mb-12 text-center">
+                <div class="flex justify-center items-center space-x-2 mb-4">
+                    <span class="bg-white text-kuroda-red rounded-full w-12 h-12 flex items-center justify-center text-2xl font-bold">K</span>
+                    <h1 class="text-3xl font-bold">uroda</h1>
+                </div>
+                <p class="text-sm">La Experiencia está en...</p>
+            </div>
+
+            <form id="login-form" class="w-full max-w-sm space-y-4">
+                <input type="email" id="log-email" placeholder="Correo electrónico" class="input-field" required>
+                <input type="password" id="log-password" placeholder="Contraseña" class="input-field" required>
+
+                <button type="submit" class="w-full kuroda-btn-primary mt-6">Iniciar sesión</button>
+            </form>
+
+            <p class="mt-6 text-sm">
+                <a href="#" class="font-semibold underline">¿Olvidaste tu contraseña?</a>
+            </p>
+            <button onclick="showScreen('register-screen')" class="mt-16 text-sm kuroda-btn-secondary w-full max-w-sm">Crear cuenta</button>
+        </div>
+    </div>
+
+    <!-- 3. Pantalla Dashboard -->
+    <div id="dashboard-screen" class="screen-container">
+        <div class="kuroda-header">
+            <div class="flex items-center space-x-2">
+                <span class="bg-white text-kuroda-red rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold">K</span>
+                <h1 class="text-xl font-bold">uroda</h1>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="showScreen('cart-screen')" aria-label="Carrito">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 12.08a2 2 0 0 0 2 1.92h9.64a2 2 0 0 0 2-1.92l.7-4.23"></path></svg>
+                </button>
+                <button onclick="logout()" aria-label="Cerrar Sesión">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col flex-grow bg-kuroda-red p-6">
+            <h2 class="text-3xl font-bold text-white mb-8">Dashboard</h2>
+
+            <div class="kuroda-card flex-grow p-4 md:p-6">
+                <h3 class="text-xl font-semibold text-kuroda-red mb-4">Productos en oferta</h3>
+
+                <div id="offer-products" class="grid grid-cols-2 gap-4">
+                    <!-- Productos se insertan aquí -->
+                </div>
+
+                <button onclick="showScreen('catalog-screen')" class="w-full kuroda-btn-secondary mt-8">Ver catálogo completo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Pantalla Catálogo de Grifería -->
+    <div id="catalog-screen" class="screen-container">
+        <div class="kuroda-header">
+            <button onclick="showScreen('dashboard-screen')" aria-label="Volver">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="flex items-center space-x-2">
+                <span class="bg-white text-kuroda-red rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold">K</span>
+                <h1 class="text-xl font-bold">uroda</h1>
+            </div>
+            <button onclick="showScreen('cart-screen')" aria-label="Carrito">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 12.08a2 2 0 0 0 2 1.92h9.64a2 2 0 0 0 2-1.92l.7-4.23"></path></svg>
+            </button>
+        </div>
+
+        <div class="flex flex-col flex-grow bg-kuroda-red p-6">
+            <h2 class="text-3xl font-bold text-white mb-6">Catálogo de Grifería</h2>
+
+            <!-- Búsqueda y Filtro -->
+            <div class="relative mb-6">
+                <input type="text" id="search-input" placeholder="Buscar productos" class="input-field pr-12 text-kuroda-red">
+                <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-kuroda-red" aria-label="Filtrar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z"></path></svg>
+                </button>
+            </div>
+
+            <div id="product-list" class="flex flex-col space-y-3 flex-grow overflow-y-auto">
+                <!-- Productos del catálogo se insertan aquí -->
+            </div>
+
+            <button onclick="addProductFromCatalog()" class="kuroda-btn-secondary mt-6 p-3">Agregar producto</button>
+        </div>
+    </div>
+
+    <!-- 5. Pantalla Detalle del Producto -->
+    <div id="detail-screen" class="screen-container">
+        <div class="kuroda-header">
+            <button onclick="showScreen('catalog-screen')" aria-label="Volver">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="flex items-center space-x-2">
+                <span class="bg-white text-kuroda-red rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold">K</span>
+                <h1 class="text-xl font-bold">uroda</h1>
+            </div>
+            <button onclick="showScreen('cart-screen')" aria-label="Carrito">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 12.08a2 2 0 0 0 2 1.92h9.64a2 2 0 0 0 2-1.92l.7-4.23"></path></svg>
+            </button>
+        </div>
+
+        <div class="flex flex-col flex-grow bg-kuroda-red p-6">
+            <h2 class="text-3xl font-bold text-white mb-6">Detalle del producto</h2>
+
+            <div id="product-detail-card" class="kuroda-card flex-grow p-4 md:p-6">
+                <!-- Contenido del detalle del producto se inserta aquí -->
+            </div>
+
+            <div class="mt-6 space-y-3">
+                <button id="add-to-cart-btn" class="w-full kuroda-btn-secondary p-3">Agregar al carrito</button>
+                <button onclick="showScreen('catalog-screen')" class="w-full kuroda-btn-primary p-3">Volver al catálogo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Pantalla Carrito / Ticket de venta -->
+    <div id="cart-screen" class="screen-container">
+        <div class="kuroda-header">
+            <button onclick="showScreen('dashboard-screen')" aria-label="Volver">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="flex items-center space-x-2">
+                <span class="bg-white text-kuroda-red rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold">K</span>
+                <h1 class="text-xl font-bold">uroda</h1>
+            </div>
+            <div class="w-6 h-6"></div> <!-- Espaciador para centrar -->
+        </div>
+
+        <div class="flex flex-col flex-grow bg-kuroda-red p-6">
+            <h2 class="text-3xl font-bold text-white mb-6">Carrito / Ticket de venta</h2>
+
+            <div id="cart-items-container" class="kuroda-card p-4 md:p-6 mb-4 flex-grow overflow-y-auto">
+                <!-- Ítems del carrito se insertan aquí -->
+            </div>
+
+            <div class="kuroda-card p-4 md:p-6 mb-6">
+                <div class="flex justify-between text-gray-700 mb-2">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal" class="font-semibold">$0.00</span>
+                </div>
+                <div class="flex justify-between text-gray-700 mb-2">
+                    <span>IVA (16%)</span>
+                    <span id="cart-iva" class="font-semibold">$0.00</span>
+                </div>
+                <div class="flex justify-between text-kuroda-red text-xl font-bold border-t pt-3 mt-3">
+                    <span>Total</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="showScreen('payment-method-screen')" class="w-full kuroda-btn-secondary p-3">Confirmar venta</button>
+                <button onclick="showScreen('catalog-screen')" class="w-full kuroda-btn-primary p-3">Seguir comprando</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Pantalla Método de Pago -->
+    <div id="payment-method-screen" class="screen-container">
+        <div class="kuroda-header">
+            <button onclick="showScreen('cart-screen')" aria-label="Volver">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="flex items-center space-x-2">
+                <span class="bg-white text-kuroda-red rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold">K</span>
+                <h1 class="text-xl font-bold">uroda</h1>
+            </div>
+            <div class="w-6 h-6"></div>
+        </div>
+
+        <div class="flex flex-col flex-grow bg-kuroda-red p-6">
+            <h2 class="text-3xl font-bold text-white mb-6">Método de pago</h2>
+
+            <div class="text-xl font-medium text-white mb-6">
+                Total a pagar: <span id="payment-total">$0.00</span>
+            </div>
+
+            <div id="payment-options" class="space-y-4 flex-grow">
+                <div class="kuroda-card flex items-center p-4 cursor-pointer hover:bg-kuroda-light" onclick="selectPaymentMethod('Efectivo')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-kuroda-red mr-3"><rect x="3" y="10" width="18" height="10" rx="2"></rect><path d="M7 10V7a5 5 0 0 1 10 0v3"></path><line x1="12" y1="14" x2="12" y2="16"></line></svg>
+                    <span class="font-medium text-gray-800">Efectivo</span>
+                </div>
+                <div class="kuroda-card flex items-center p-4 cursor-pointer hover:bg-kuroda-light" onclick="selectPaymentMethod('Tarjeta')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-kuroda-red mr-3"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                    <span class="font-medium text-gray-800">Tarjeta</span>
+                </div>
+                <div class="kuroda-card flex items-center p-4 cursor-pointer hover:bg-kuroda-light" onclick="selectPaymentMethod('Transferencia')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-kuroda-red mr-3"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4.04a2 2 0 0 0-2 0l-7 4.04A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4.04a2 2 0 0 0 2 0l7-4.04A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><polyline points="12 21 12 12"></polyline></svg>
+                    <span class="font-medium text-gray-800">Transferencia</span>
+                </div>
+                <div class="kuroda-card flex items-center p-4 cursor-pointer hover:bg-kuroda-light" onclick="selectPaymentMethod('Mixto')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-kuroda-red mr-3"><path d="M12 2v20M17 5H7l-2 5 2 5h10l2-5-2-5z"></path></svg>
+                    <span class="font-medium text-gray-800">Mixto</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-6 space-x-3">
+                <button onclick="showScreen('cart-screen')" class="w-1/2 kuroda-btn-primary p-3">Regresar al carrito</button>
+                <button id="continue-payment-btn" disabled class="w-1/2 kuroda-btn-secondary p-3 opacity-50" onclick="processPayment()">Continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. Pantalla Confirmación de Pago -->
+    <div id="payment-confirmation-screen" class="screen-container text-center">
+        <div class="kuroda-full-bg flex flex-col justify-center items-center p-8">
+            <h2 class="text-3xl font-bold text-white mb-10">Confirmación de pago</h2>
+
+            <div id="payment-status-pending">
+                <p class="mb-8">Procesando tu pago, por favor espera...</p>
+                <!-- Icono de carga (Spinner) -->
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white mx-auto mb-10"></div>
+                <p class="text-sm">Estamos verificando tu transacción. Este proceso puede tardar unos segundos.</p>
+            </div>
+
+            <div id="payment-status-success" class="hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white mx-auto mb-6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <h3 class="text-2xl font-bold mb-4">Pago exitoso</h3>
+                <p class="text-lg">Total pagado: <span id="paid-total-summary">$0.00</span></p>
+                <p class="text-lg mb-10">Método: <span id="paid-method-summary"></span></p>
+
+                <div class="flex justify-center space-x-4">
+                    <button onclick="showScreen('cart-screen')" class="w-1/2 kuroda-btn-primary p-3">Regresar al carrito</button>
+                    <button onclick="showScreen('sale-confirmation-screen')" class="w-1/2 kuroda-btn-secondary p-3">Continuar al resumen del pedido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. Pantalla Confirmación de Venta -->
+    <div id="sale-confirmation-screen" class="screen-container">
+        <div class="uroda-header">
+            <div class="w-6 h-6"></div>
+            <div class="flex items-center space-x-2">
+                <span class="bg-white text-kuroda-red rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold">K</span>
+                <h1 class="text-xl font-bold">uroda</h1>
+            </div>
+            <div class="w-6 h-6"></div>
+        </div>
+
+        <div class="flex flex-col flex-grow bg-kuroda-red p-6">
+            <h2 class="text-3xl font-bold text-white mb-6 text-center">Confirmación de venta</h2>
+
+            <div class="kuroda-card p-6 md:p-8 flex-grow">
+                <div id="sale-summary-items" class="space-y-4 mb-6 pb-4 border-b">
+                    <!-- Resumen de items vendidos -->
+                </div>
+
+                <div class="flex justify-between text-gray-700 mb-2">
+                    <span>Subtotal</span>
+                    <span id="sale-subtotal" class="font-semibold">$0.00</span>
+                </div>
+                <div class="flex justify-between text-gray-700 mb-2">
+                    <span>IVA</span>
+                    <span id="sale-iva" class="font-semibold">$0.00</span>
+                </div>
+                <div class="flex justify-between text-kuroda-red text-xl font-bold border-t pt-3 mt-3">
+                    <span>Total</span>
+                    <span id="sale-total">$0.00</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-6 space-x-3">
+                <button class="w-1/2 kuroda-btn-secondary p-3" onclick="download('ticket')">Descargar ticket</button>
+                <button class="w-1/2 kuroda-btn-secondary p-3" onclick="download('invoice')">Descargar factura</button>
+            </div>
+            <button onclick="showScreen('dashboard-screen')" class="w-full kuroda-btn-primary p-3 mt-4">Finalizar y Volver</button>
+        </div>
+    </div>
+    
+    <!-- Modal para mensajes/errores, reemplaza a alert() -->
+    <div id="app-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white p-6 rounded-lg max-w-sm w-full shadow-2xl">
+            <h3 id="modal-title" class="text-xl font-bold text-kuroda-red mb-4"></h3>
+            <p id="modal-message" class="text-gray-700 mb-6"></p>
+            <button onclick="closeModal()" class="w-full kuroda-btn-secondary p-3">Aceptar</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Configuración y Datos Iniciales ---
+    const SCREENS = ['register-screen', 'login-screen', 'dashboard-screen', 'catalog-screen', 'detail-screen', 'cart-screen', 'payment-method-screen', 'payment-confirmation-screen', 'sale-confirmation-screen'];
+    let currentProductDetail = null;
+    let selectedPaymentMethod = null;
+
+    // Productos de ejemplo basados en las imágenes
+    const PRODUCTS = [
+        { id: '0001', name: 'Monomando para lavabo', code: '0001', price: 50.00, stock: 20, description: 'Grifo elegante para lavabo. Material: Metálico, Acabado: Cromado.', image: 'https://placehold.co/100x100/A30000/FFFFFF?text=LAV' },
+        { id: '0002', name: 'Monomando para tina', code: '0002', price: 70.00, stock: 15, description: 'Grifo de alta presión para tina. Material: Acero inoxidable, Acabado: Pulido.', image: 'https://placehold.co/100x100/A30000/FFFFFF?text=TINA' },
+        { id: '0003', name: 'Monomando para ducha', code: '0003', price: 55.00, stock: 8, description: 'Cabezal de ducha ajustable. Material: Plástico ABS, Acabado: Blanco.', image: 'https://placehold.co/100x100/A30000/FFFFFF?text=DUCHA' },
+        { id: '0004', name: 'Llave de agua', code: '0004', price: 10.00, stock: 30, description: 'Llave simple de jardín/lavadero. Material: Bronce.', image: 'https://placehold.co/100x100/A30000/FFFFFF?text=LLAVE' },
+        { id: '0005', name: 'Grifo de cocina', code: '0005', price: 90.00, stock: 12, description: 'Grifo alto con cuello de cisne para cocina. Material: Cobre.', image: 'https://placehold.co/100x100/A30000/FFFFFF?text=COC' },
+        { id: '0006', name: 'Grifo de baño', code: '0006', price: 45.99, stock: 18, description: 'Grifo de baño moderno de bajo consumo.', image: 'https://placehold.co/100x100/A30000/FFFFFF?text=BAÑO' },
+        { id: '0007', name: 'Grifo de mano', code: '0007', price: 25.99, stock: 25, description: 'Ducha de mano con múltiples funciones.', image: 'https://placehold.co/100x100/A30000/FFFFFF?text=MANO' },
+        { id: '0008', name: 'Grifo de ducha', code: '0008', price: 35.99, stock: 14, description: 'Sistema de ducha fija de alto rendimiento.', image: 'https://placehold.co/100x100/A30000/FFFFFF?text=DCH' },
+    ];
+
+    // --- Funciones de Utilidad ---
+
+    /**
+     * Muestra el modal de mensaje.
+     * @param {string} title - Título del modal.
+     * @param {string} message - Mensaje a mostrar.
+     */
+    function showModal(title, message) {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-message').textContent = message;
+        document.getElementById('app-modal').classList.remove('hidden');
+    }
+
+    /**
+     * Cierra el modal.
+     */
+    function closeModal() {
+        document.getElementById('app-modal').classList.add('hidden');
+    }
+
+    /**
+     * Cambia la pantalla activa.
+     * @param {string} screenId - ID de la pantalla a mostrar (ej: 'login-screen').
+     */
+    function showScreen(screenId) {
+        SCREENS.forEach(id => {
+            const screen = document.getElementById(id);
+            if (screen) {
+                screen.classList.remove('active');
+            }
+        });
+        const nextScreen = document.getElementById(screenId);
+        if (nextScreen) {
+            nextScreen.classList.add('active');
+        }
+
+        // Acciones específicas al cambiar de pantalla
+        if (screenId === 'dashboard-screen') {
+            renderDashboardOffers();
+        } else if (screenId === 'catalog-screen') {
+            renderCatalog(PRODUCTS);
+        } else if (screenId === 'cart-screen') {
+            renderCart();
+        } else if (screenId === 'payment-method-screen') {
+            updatePaymentScreenTotal();
+        } else if (screenId === 'sale-confirmation-screen') {
+            renderSaleConfirmation();
+        }
+    }
+
+    // --- Funciones de Datos (localStorage) ---
+
+    /**
+     * Obtiene los usuarios registrados.
+     * @returns {Array} Lista de usuarios.
+     */
+    function getUsers() {
+        const users = localStorage.getItem('kuroda_users');
+        return users ? JSON.parse(users) : [];
+    }
+
+    /**
+     * Guarda el usuario actual.
+     * @param {object} user - Objeto del usuario.
+     */
+    function setCurrentUser(user) {
+        localStorage.setItem('kuroda_currentUser', JSON.stringify(user));
+    }
+
+    /**
+     * Obtiene el usuario actual logueado.
+     * @returns {object|null} Objeto del usuario o null.
+     */
+    function getCurrentUser() {
+        const user = localStorage.getItem('kuroda_currentUser');
+        return user ? JSON.parse(user) : null;
+    }
+
+    /**
+     * Obtiene el carrito de compras.
+     * @returns {Array} Lista de items en el carrito.
+     */
+    function getCart() {
+        const cart = localStorage.getItem('kuroda_cart');
+        return cart ? JSON.parse(cart) : [];
+    }
+
+    /**
+     * Guarda el carrito de compras.
+     * @param {Array} cart - Lista de items.
+     */
+    function saveCart(cart) {
+        localStorage.setItem('kuroda_cart', JSON.stringify(cart));
+    }
+
+    // --- Funciones de Autenticación ---
+
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const confirmPassword = document.getElementById('reg-confirm-password').value;
+
+        if (password !== confirmPassword) {
+            showModal('Error de Registro', 'Las contraseñas no coinciden.');
+            return;
+        }
+
+        const users = getUsers();
+        if (users.some(user => user.email === email)) {
+            showModal('Error de Registro', 'El correo electrónico ya está registrado.');
+            return;
+        }
+
+        const newUser = { name, email, phone, password };
+        users.push(newUser);
+        localStorage.setItem('kuroda_users', JSON.stringify(users));
+
+        showModal('Registro Exitoso', 'Usuario registrado con éxito. Ahora puedes iniciar sesión.');
+        showScreen('login-screen');
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('log-email').value.trim();
+        const password = document.getElementById('log-password').value;
+
+        const users = getUsers();
+        const user = users.find(u => u.email === email && u.password === password);
+
+        if (user) {
+            setCurrentUser(user);
+            showScreen('dashboard-screen');
+        } else {
+            showModal('Error de Acceso', 'Correo electrónico o contraseña incorrectos.');
+        }
+    });
+
+    /**
+     * Cierra la sesión del usuario.
+     */
+    function logout() {
+        localStorage.removeItem('kuroda_currentUser');
+        saveCart([]); // Vaciar carrito al cerrar sesión
+        showScreen('login-screen');
+    }
+
+    // --- Funciones de Productos y Catálogo ---
+
+    /**
+     * Renderiza las ofertas en el Dashboard.
+     */
+    function renderDashboardOffers() {
+        const offersContainer = document.getElementById('offer-products');
+        offersContainer.innerHTML = ''; // Limpiar
+
+        // Tomar 4 productos para simular ofertas
+        const offerProducts = PRODUCTS.slice(0, 4);
+
+        offerProducts.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'kuroda-card flex flex-col items-center p-3 text-kuroda-dark text-center cursor-pointer';
+            productElement.onclick = () => showProductDetail(product.id);
+            productElement.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" class="w-20 h-20 rounded-lg mb-2 object-cover">
+                <span class="text-sm font-medium">${product.name.split(' ').slice(0, 3).join(' ')}</span>
+                <span class="text-xs line-through text-gray-500">$${(product.price * 1.2).toFixed(2)}</span>
+                <span class="text-lg font-bold text-kuroda-red">$${product.price.toFixed(2)}</span>
+            `;
+            offersContainer.appendChild(productElement);
+        });
+    }
+
+    /**
+     * Renderiza el catálogo de productos.
+     * @param {Array} productList - Lista de productos a mostrar.
+     */
+    function renderCatalog(productList) {
+        const productListContainer = document.getElementById('product-list');
+        productListContainer.innerHTML = ''; // Limpiar
+
+        if (productList.length === 0) {
+            productListContainer.innerHTML = '<p class="text-white text-center mt-8">No se encontraron productos.</p>';
+            return;
+        }
+
+        productList.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'kuroda-card flex items-center p-3 space-x-4 cursor-pointer hover:bg-kuroda-light';
+            productElement.onclick = () => showProductDetail(product.id);
+            productElement.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover">
+                <div class="flex-grow">
+                    <p class="font-medium text-kuroda-dark">${product.name}</p>
+                    <p class="text-xs text-gray-500">Código: ${product.code}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-kuroda-red">$${product.price.toFixed(2)}</p>
+                    <p class="text-xs text-gray-600">En stock: ${product.stock}</p>
+                </div>
+            `;
+            productListContainer.appendChild(productElement);
+        });
+    }
+
+    // Evento de búsqueda
+    document.getElementById('search-input').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredProducts = PRODUCTS.filter(product =>
+            product.name.toLowerCase().includes(searchTerm) ||
+            product.code.toLowerCase().includes(searchTerm) ||
+            product.description.toLowerCase().includes(searchTerm)
+        );
+        renderCatalog(filteredProducts);
+    });
+
+    /**
+     * Muestra el detalle de un producto y actualiza la vista.
+     * @param {string} productId - ID del producto.
+     */
+    function showProductDetail(productId) {
+        const product = PRODUCTS.find(p => p.id === productId);
+        if (!product) {
+            showModal('Error', 'Producto no encontrado.');
+            return;
+        }
+
+        currentProductDetail = product;
+        const detailCard = document.getElementById('product-detail-card');
+        detailCard.innerHTML = `
+            <div class="text-center mb-6">
+                <img src="${product.image}" alt="${product.name}" class="w-48 h-48 mx-auto rounded-lg mb-4 object-cover">
+                <h3 class="text-2xl font-bold text-kuroda-dark">${product.name}</h3>
+                <p class="text-sm text-gray-500">Código: ${product.code}</p>
+            </div>
+            <div class="text-center mb-6">
+                <p class="text-4xl font-bold text-kuroda-red mb-2">$${product.price.toFixed(2)}</p>
+                <p class="text-base text-gray-600">Stock disponible: ${product.stock}</p>
+            </div>
+            <div class="text-left text-sm text-gray-700 space-y-2">
+                <p><span class="font-semibold">Descripción:</span> ${product.description}</p>
+                <p><span class="font-semibold">Material:</span> Metálico</p>
+                <p><span class="font-semibold">Acabado:</span> Cromado</p>
+            </div>
+        `;
+        document.getElementById('add-to-cart-btn').onclick = () => addToCart(product.id, 1);
+        showScreen('detail-screen');
+    }
+
+    /**
+     * Simula agregar producto desde el catálogo (solo para navegación).
+     */
+    function addProductFromCatalog() {
+        // En una app real, aquí se abriría un modal para elegir cantidad o se agregaría 1 por defecto.
+        // Por simplicidad, navegamos a la vista de detalle del primer producto para agregar.
+        showProductDetail(PRODUCTS[0].id);
+    }
+
+    // --- Funciones de Carrito ---
+
+    /**
+     * Agrega un producto al carrito.
+     * @param {string} productId - ID del producto.
+     * @param {number} quantity - Cantidad a agregar.
+     */
+    function addToCart(productId, quantity) {
+        const product = PRODUCTS.find(p => p.id === productId);
+        if (!product) return;
+
+        let cart = getCart();
+        const existingItemIndex = cart.findIndex(item => item.id === productId);
+
+        if (existingItemIndex > -1) {
+            cart[existingItemIndex].quantity += quantity;
+        } else {
+            cart.push({ ...product, quantity: quantity });
+        }
+
+        saveCart(cart);
+        showModal('Producto Agregado', `${quantity} x ${product.name} añadido al carrito.`);
+        renderCart();
+        showScreen('cart-screen'); // Navegar al carrito después de agregar
+    }
+
+    /**
+     * Renderiza los items del carrito y actualiza los totales.
+     */
+    function renderCart() {
+        const cart = getCart();
+        const container = document.getElementById('cart-items-container');
+        container.innerHTML = '';
+
+        if (cart.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-10">El carrito está vacío.</p>';
+        }
+
+        let subtotal = 0;
+
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+
+            const itemElement = document.createElement('div');
+            itemElement.className = 'flex items-center justify-between p-3 border-b last:border-b-0';
+            itemElement.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded-md object-cover">
+                    <div>
+                        <p class="font-medium text-kuroda-dark">${item.name}</p>
+                        <p class="text-xs text-gray-500">CÓD. ${item.code}</p>
+                        <div class="flex items-center space-x-2 text-sm mt-1">
+                            <input type="number" value="${item.quantity}" min="1" onchange="updateCartQuantity('${item.id}', this.value)"
+                                class="w-12 text-center border rounded-md text-kuroda-dark p-0.5">
+                            <span class="text-gray-600">x $${item.price.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-kuroda-red">$${itemTotal.toFixed(2)}</p>
+                    <button onclick="removeFromCart('${item.id}')" class="text-gray-400 hover:text-kuroda-red mt-1" aria-label="Eliminar ítem">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+            `;
+            container.appendChild(itemElement);
+        });
+
+        const ivaRate = 0.16;
+        const iva = subtotal * ivaRate;
+        const total = subtotal + iva;
+
+        // Actualizar totales
+        document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('cart-iva').textContent = `$${iva.toFixed(2)}`;
+        document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('payment-total').textContent = `$${total.toFixed(2)}`;
+
+        // Guardar totales para uso posterior
+        localStorage.setItem('kuroda_totals', JSON.stringify({ subtotal, iva, total }));
+    }
+
+    /**
+     * Actualiza la cantidad de un item en el carrito.
+     * @param {string} productId - ID del producto.
+     * @param {string|number} quantityStr - Nueva cantidad.
+     */
+    function updateCartQuantity(productId, quantityStr) {
+        const quantity = parseInt(quantityStr);
+        if (isNaN(quantity) || quantity < 1) {
+            renderCart(); // Re-renderizar si es inválido
+            return;
+        }
+
+        let cart = getCart();
+        const itemIndex = cart.findIndex(item => item.id === productId);
+
+        if (itemIndex > -1) {
+            cart[itemIndex].quantity = quantity;
+            saveCart(cart);
+            renderCart();
+        }
+    }
+
+    /**
+     * Elimina un producto del carrito.
+     * @param {string} productId - ID del producto.
+     */
+    function removeFromCart(productId) {
+        let cart = getCart();
+        cart = cart.filter(item => item.id !== productId);
+        saveCart(cart);
+        renderCart();
+    }
+
+    // --- Funciones de Pago ---
+
+    /**
+     * Actualiza el total en la pantalla de método de pago.
+     */
+    function updatePaymentScreenTotal() {
+        const totals = JSON.parse(localStorage.getItem('kuroda_totals') || '{}');
+        document.getElementById('payment-total').textContent = `$${(totals.total || 0).toFixed(2)}`;
+        // Reiniciar método de pago
+        selectedPaymentMethod = null;
+        document.getElementById('continue-payment-btn').disabled = true;
+        document.getElementById('continue-payment-btn').classList.add('opacity-50');
+    }
+
+    /**
+     * Selecciona el método de pago.
+     * @param {string} method - Método de pago seleccionado.
+     */
+    function selectPaymentMethod(method) {
+        selectedPaymentMethod = method;
+        document.getElementById('continue-payment-btn').disabled = false;
+        document.getElementById('continue-payment-btn').classList.remove('opacity-50');
+
+        // Resaltar la opción seleccionada (solo para efectos visuales)
+        const options = document.querySelectorAll('#payment-options > div');
+        options.forEach(opt => {
+            opt.classList.remove('border-2', 'border-kuroda-red');
+            if (opt.textContent.includes(method)) {
+                opt.classList.add('border-2', 'border-kuroda-red');
+            }
+        });
+    }
+
+    /**
+     * Simula el proceso de pago.
+     */
+    function processPayment() {
+        if (!selectedPaymentMethod) {
+            showModal('Error', 'Por favor, selecciona un método de pago.');
+            return;
+        }
+
+        showScreen('payment-confirmation-screen');
+
+        // Mostrar estado pendiente
+        document.getElementById('payment-status-pending').classList.remove('hidden');
+        document.getElementById('payment-status-success').classList.add('hidden');
+
+        // Simular un proceso de pago de 3 segundos
+        setTimeout(() => {
+            const totals = JSON.parse(localStorage.getItem('kuroda_totals') || '{}');
+
+            // Guardar la venta en localStorage (simulado)
+            const sales = JSON.parse(localStorage.getItem('kuroda_sales') || '[]');
+            const newSale = {
+                id: Date.now().toString(),
+                items: getCart(),
+                totals: totals,
+                method: selectedPaymentMethod,
+                date: new Date().toLocaleString()
+            };
+            sales.push(newSale);
+            localStorage.setItem('kuroda_sales', JSON.stringify(sales));
+
+            // Actualizar la UI a éxito
+            document.getElementById('payment-status-pending').classList.add('hidden');
+            document.getElementById('paid-total-summary').textContent = `$${totals.total.toFixed(2)}`;
+            document.getElementById('paid-method-summary').textContent = selectedPaymentMethod;
+            document.getElementById('payment-status-success').classList.remove('hidden');
+
+            // Limpiar carrito después de la compra exitosa
+            saveCart([]);
+        }, 3000);
+    }
+
+    // --- Funciones de Confirmación de Venta ---
+
+    /**
+     * Renderiza el resumen de la última venta.
+     */
+    function renderSaleConfirmation() {
+        const sales = JSON.parse(localStorage.getItem('kuroda_sales') || '[]');
+        const lastSale = sales.length > 0 ? sales[sales.length - 1] : null;
+
+        if (!lastSale) {
+            showModal('Error', 'No se encontró el registro de la última venta.');
+            showScreen('dashboard-screen');
+            return;
+        }
+
+        const container = document.getElementById('sale-summary-items');
+        container.innerHTML = '';
+
+        lastSale.items.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'flex justify-between items-center';
+            itemElement.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <img src="${item.image}" alt="${item.name}" class="w-8 h-8 rounded-md object-cover">
+                    <p class="text-gray-800">${item.name} <span class="text-sm text-gray-500">(${item.quantity}x)</span></p>
+                </div>
+                <p class="font-medium text-gray-800">$${(item.price * item.quantity).toFixed(2)}</p>
+            `;
+            container.appendChild(itemElement);
+        });
+
+        // Actualizar totales
+        document.getElementById('sale-subtotal').textContent = `$${lastSale.totals.subtotal.toFixed(2)}`;
+        document.getElementById('sale-iva').textContent = `$${lastSale.totals.iva.toFixed(2)}`;
+        document.getElementById('sale-total').textContent = `$${lastSale.totals.total.toFixed(2)}`;
+    }
+
+    /**
+     * Simula la descarga de ticket o factura.
+     * @param {string} type - 'ticket' o 'invoice'.
+     */
+    function download(type) {
+        showModal('Descarga Simulada', `Se ha generado el archivo de ${type} exitosamente. (Simulación de descarga)`);
+    }
+
+    // --- Inicialización ---
+
+    // Verificar si el usuario ya está logueado al cargar
+    function checkAuth() {
+        if (getCurrentUser()) {
+            showScreen('dashboard-screen');
+        } else {
+            showScreen('login-screen');
+        }
+    }
+
+    // Ejecutar al cargar la página
+    document.addEventListener('DOMContentLoaded', checkAuth);
+
+</script>
+
+</body>
+</html>
